@@ -375,8 +375,6 @@ npm install
 
 #### 6. 启动服务
 
-**方式一：分别启动（推荐用于开发）**
-
 终端1 - 启动后端API：
 ```bash
 python backend_api.py
@@ -388,16 +386,6 @@ cd frontend
 npm run dev
 ```
 
-**方式二：使用启动脚本**
-
-```bash
-# Windows
-start.bat
-
-# Linux/Mac
-chmod +x start.sh
-./start.sh
-```
 
 #### 7. 访问系统
 
@@ -1169,9 +1157,7 @@ pip install -r requirements.txt
 
 如有问题或建议，请通过以下方式联系：
 
--  Email: your-email@example.com
--  Issues: [GitHub Issues](https://github.com/your-repo/issues)
-- 📖 Wiki: [项目Wiki](https://github.com/your-repo/wiki)
+-  Email: guoyou_sun@163.con
 
 ---
 
@@ -1198,29 +1184,6 @@ pip install -r requirements.txt
 4. 《促进中小企业健康发展的指导意见》
 5. 《"十四五"促进中小企业发展规划》
 
----
-
-##  下一步规划
-
-### 短期（1-2周）
-- [ ] 实现Word文档完整解析
-- [ ] 实现Excel表格解析
-- [ ] 添加更多界面截图
-- [ ] 完善单元测试
-
-### 中期（1个月）
-- [ ] 实现图片OCR功能
-- [ ] 添加用户认证系统
-- [ ] 实现报告导出功能（PDF/Word）
-- [ ] 添加多轮对话记忆
-
-### 长期（3个月）
-- [ ] 实现Query改写优化
-- [ ] 添加更多可视化工具
-- [ ] 支持多语言界面
-- [ ] 移动端App开发
-
----
 
 <div align="center">
 
