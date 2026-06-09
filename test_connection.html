@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API连接测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .test-item {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px solid #e4e7ed;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .test-item:hover {
+            border-color: #409EFF;
+            box-shadow: 0 2px 12px rgba(64, 158, 255, 0.2);
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .test-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #303133;
+        }
+        
+        .test-status {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #f0f0f0;
+            color: #909399;
+        }
+        
+        .status-success {
+            background: #f0f9ff;
+            color: #67C23A;
+        }
+        
+        .status-error {
+            background: #fef0f0;
+            color: #F56C6C;
+        }
+        
+        .test-button {
+            background: #409EFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .test-button:hover {
+            background: #66b1ff;
+        }
+        
+        .test-button:disabled {
+            background: #c0c4cc;
+            cursor: not-allowed;
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f7fa;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-left: 4px solid #409EFF;
+            border-radius: 4px;
+        }
+        
+        .summary h3 {
+            color: #409EFF;
+            margin-bottom: 10px;
+        }
+        
+        .summary ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .summary li {
+            padding: 5px 0;
+            color: #606266;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #409EFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 API连接测试工具</h1>
+            <p>用于诊断前后端连接问题</p>
+        </div>
+        
+        <div class="content">
+            <!-- 测试1: 后端服务 -->
+            <div class="test-item">
+                <div class="test-header">
+                    <span class="test-title">测试1: 后端服务状态</span>
+                    <span class="test-status status-pending" id="status1">待测试</span>
+                </div>
+                <button class="test-button" onclick="testBackend()">运行测试</button>
+                <div class="test-result" id="result1" style="display:none;"></div>
+            </div>
+            
+            <!-- 测试2: 上传接口 -->
+            <div class="test-item">
+                <div class="test-header">
+                    <span class="test-title">测试2: 文件上传接口</span>
+                    <span class="test-status status-pending" id="status2">待测试</span>
+                </div>
+                <input type="file" id="testFile" style="margin-bottom: 10px;">
+                <button class="test-button" onclick="testUpload()">运行测试</button>
+                <div class="test-result" id="result2" style="display:none;"></div>
+            </div>
+            
+            <!-- 测试3: 聊天接口 -->
+            <div class="test-item">
+                <div class="test-header">
+                    <span class="test-title">测试3: 智能问答接口</span>
+                    <span class="test-status status-pending" id="status3">待测试</span>
+                </div>
+                <button class="test-button" onclick="testChat()">运行测试</button>
+                <div class="test-result" id="result3" style="display:none;"></div>
+            </div>
+            
+            <!-- 测试4: 文档列表 -->
+            <div class="test-item">
+                <div class="test-header">
+                    <span class="test-title">测试4: 文档列表接口</span>
+                    <span class="test-status status-pending" id="status4">待测试</span>
+                </div>
+                <button class="test-button" onclick="testDocuments()">运行测试</button>
+                <div class="test-result" id="result4" style="display:none;"></div>
+            </div>
+            
+            <!-- 总结 -->
+            <div class="summary">
+                <h3>📊 测试结果总结</h3>
+                <ul id="summaryList">
+                    <li>⏳ 等待测试...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const results = {
+            backend: false,
+            upload: false,
+            chat: false,
+            documents: false
+        };
+        
+        function updateStatus(id, status, message) {
+            const statusEl = document.getElementById(`status${id}`);
+            const resultEl = document.getElementById(`result${id}`);
+            
+            if (status === 'success') {
+                statusEl.className = 'test-status status-success';
+                statusEl.textContent = '✅ 通过';
+                resultEl.style.background = '#f0f9ff';
+            } else if (status === 'error') {
+                statusEl.className = 'test-status status-error';
+                statusEl.textContent = '❌ 失败';
+                resultEl.style.background = '#fef0f0';
+            }
+            
+            resultEl.style.display = 'block';
+            resultEl.textContent = message;
+        }
+        
+        function updateSummary() {
+            const summaryList = document.getElementById('summaryList');
+            let html = '';
+            
+            if (results.backend) html += '<li>✅ 后端服务正常</li>';
+            else html += '<li>❌ 后端服务异常</li>';
+            
+            if (results.upload) html += '<li>✅ 上传接口正常</li>';
+            else html += '<li>❌ 上传接口异常</li>';
+            
+            if (results.chat) html += '<li>✅ 聊天接口正常</li>';
+            else html += '<li>❌ 聊天接口异常</li>';
+            
+            if (results.documents) html += '<li>✅ 文档接口正常</li>';
+            else html += '<li>❌ 文档接口异常</li>';
+            
+            const allPassed = Object.values(results).every(r => r);
+            if (allPassed) {
+                html += '<li style="color: #67C23A; font-weight: bold; margin-top: 10px;">🎉 所有测试通过！前后端连接正常。</li>';
+            } else {
+                html += '<li style="color: #F56C6C; font-weight: bold; margin-top: 10px;">⚠️ 部分测试失败，请查看DIAGNOSTIC_GUIDE.md进行排查。</li>';
+            }
+            
+            summaryList.innerHTML = html;
+        }
+        
+        async function testBackend() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>测试中...';
+            
+            try {
+                const response = await fetch('http://localhost:8000');
+                const data = await response.json();
+                
+                results.backend = true;
+                updateStatus(1, 'success', JSON.stringify(data, null, 2));
+            } catch (error) {
+                results.backend = false;
+                updateStatus(1, 'error', `错误: ${error.message}\n\n可能原因:\n1. 后端服务未启动\n2. 端口8000被占用\n3. 防火墙阻止\n\n解决方法:\npython backend_api.py`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '重新测试';
+                updateSummary();
+            }
+        }
+        
+        async function testUpload() {
+            const fileInput = document.getElementById('testFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('请先选择一个文件');
+                return;
+            }
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>测试中...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch('http://localhost:8000/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    results.upload = true;
+                    updateStatus(2, 'success', JSON.stringify(data, null, 2));
+                } else {
+                    results.upload = false;
+                    updateStatus(2, 'error', `上传失败: ${JSON.stringify(data, null, 2)}`);
+                }
+            } catch (error) {
+                results.upload = false;
+                updateStatus(2, 'error', `错误: ${error.message}\n\n可能原因:\n1. CORS配置问题\n2. uploads目录不存在\n3. 文件格式不支持\n\n检查:\n- backend_api.py CORS配置\n- logs/目录日志`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '重新测试';
+                updateSummary();
+            }
+        }
+        
+        async function testChat() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>测试中...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: '你好' })
+                });
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let content = '';
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    content += decoder.decode(value, { stream: true });
+                }
+                
+                results.chat = true;
+                updateStatus(3, 'success', `响应内容（前200字符）:\n${content.substring(0, 200)}...`);
+            } catch (error) {
+                results.chat = false;
+                updateStatus(3, 'error', `错误: ${error.message}\n\n可能原因:\n1. 智能体初始化失败\n2. API Key未配置\n3. RAG服务异常\n\n检查:\n- .env文件中的DASHSCOPE_API_KEY\n- logs/目录日志`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '重新测试';
+                updateSummary();
+            }
+        }
+        
+        async function testDocuments() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>测试中...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/documents');
+                const data = await response.json();
+                
+                if (data.success) {
+                    results.documents = true;
+                    updateStatus(4, 'success', `文档数量: ${data.total}\n\n数据:\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    results.documents = false;
+                    updateStatus(4, 'error', `获取失败: ${JSON.stringify(data, null, 2)}`);
+                }
+            } catch (error) {
+                results.documents = false;
+                updateStatus(4, 'error', `错误: ${error.message}\n\n可能原因:\n1. uploads目录不存在\n2. 权限问题\n\n检查:\n- uploads/目录是否存在\n- logs/目录日志`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '重新测试';
+                updateSummary();
+            }
+        }
+    </script>
+</body>
+</html>
