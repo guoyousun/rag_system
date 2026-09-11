@@ -1,20 +1,15 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
-  },
   server: {
-    port: 3000,
+    port: 5173,
+    host: '0.0.0.0',
     proxy: {
+      // 开发环境把 /api 代理到 FastAPI 后端
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true
       }
     }

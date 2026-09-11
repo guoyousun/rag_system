@@ -1,0 +1,54 @@
+# ============================================================
+# 基础设施编排：MySQL / Neo4j / Redis 
+# 用法:  docker compose up -d
+# 注意: 启动后按 backend/.env 修改对应密码，保持一致
+# ============================================================
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mmqa-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: multi_mode_qa
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mmqa-mysql-data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis：如本机已有实例（127.0.0.1:6379）可直接复用后端连接，
+  # 无需启动容器；如需容器版可取消以下注释
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: mmqa-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - mmqa-redis-data:/data
+  #   command: redis-server --appendonly yes
+
+  neo4j:
+    image: neo4j:5.20-community
+    container_name: mmqa-neo4j
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: neo4j/neo4j123456
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 1G
+    ports:
+      - "7474:7474"   # HTTP 管理界面
+      - "7687:7687"   # Bolt 驱动端口
+    volumes:
+      - mmqa-neo4j-data:/data
+
+volumes:
+  mmqa-mysql-data:
+  mmqa-neo4j-data:

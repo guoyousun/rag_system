@@ -1,0 +1,29 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  background: #f5f7fa;
+}
+
+/* 页面通用容器 */
+.page-container {
+  padding: 20px;
+}
+
+/* markdown 引用来源卡片 */
+.source-card {
+  border-left: 3px solid #409eff;
+  background: #f4f8ff;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  font-size: 13px;
+  color: #555;
+}

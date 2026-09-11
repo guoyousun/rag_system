@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>系统架构图 - 工业软件多模式协同智能问答系统</title>
+<style>
+  :root {
+    --accent: #8BC8EA; --accent-deep: #2E6E9E;
+    --text: #1A1B1C; --sec: #6B7280; --border: #E4E3DD;
+    --bg: #FFFFFF; --card: #F7F9FB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif; background: #F4F3EE; color: var(--text); padding: 24px; line-height: 1.5; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .sub { color: var(--sec); font-size: 13px; margin-bottom: 20px; }
+  .layer { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+  .layer-title { font-size: 13px; font-weight: 600; color: var(--accent-deep); margin-bottom: 10px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .node { flex: 1 1 150px; min-width: 0; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; font-size: 12px; }
+  .node b { display: block; font-size: 13px; color: var(--text); }
+  .node .tag { display: inline-block; background: rgba(139,200,234,0.25); color: var(--accent-deep); border-radius: 4px; padding: 0 6px; font-size: 11px; margin-top: 4px; }
+  .pipeline { display: flex; align-items: stretch; gap: 6px; flex-wrap: wrap; }
+  .step { flex: 1 1 110px; min-width: 0; background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--accent-deep); border-radius: 8px; padding: 6px 10px; font-size: 12px; }
+  .step b { display: block; font-size: 12.5px; }
+  .arrow { align-self: center; color: var(--sec); font-size: 14px; flex: 0 0 auto; }
+  .legend { font-size: 11px; color: var(--sec); margin-top: 8px; }
+  .legend span { margin-right: 12px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+</style>
+</head>
+<body>
+  <h1>工业软件平台多模式协同智能问答系统 · 系统架构</h1>
+  <div class="sub">BM25 + 向量 + 知识图谱 三路混合检索 · 千问大模型 · 四类存储协同</div>
+
+  <div class="layer">
+    <div class="layer-title">① 前端交互层（Vue3 + Vite + Element Plus）</div>
+    <div class="row">
+      <div class="node"><b>登录 / 注册 / 改密</b><span class="tag">JWT</span></div>
+      <div class="node"><b>智能问答</b><span class="tag">会话 + 引用来源</span></div>
+      <div class="node"><b>文档管理</b><span class="tag">上传 / 状态轮询</span></div>
+      <div class="node"><b>知识图谱</b><span class="tag">ECharts 力导向图</span></div>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-title">② 接口层（FastAPI · RESTful /api/v1 · JWT 鉴权）</div>
+    <div class="row">
+      <div class="node"><b>/auth</b><span class="tag">register / login / logout / change-password</span></div>
+      <div class="node"><b>/documents</b><span class="tag">upload / list / delete / reprocess</span></div>
+      <div class="node"><b>/chats</b><span class="tag">会话 CRUD / 问答 / SSE 流式</span></div>
+      <div class="node"><b>/search · /graph</b><span class="tag">三路检索调试 / 图谱概览</span></div>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-title">③ 服务层（核心业务）</div>
+    <div class="row" style="margin-bottom:12px;">
+      <div class="node" style="flex-basis:46%;">
+        <b>文档处理流水线（状态机）</b>
+        <div class="pipeline" style="margin-top:8px;">
+          <div class="step"><b>上传</b></div>
+          <div class="arrow">→</div>
+          <div class="step"><b>解析</b>txt/md/pdf/docx</div>
+          <div class="arrow">→</div>
+          <div class="step"><b>分块</b>500字/重叠50</div>
+          <div class="arrow">→</div>
+          <div class="step"><b>向量化</b>Chroma</div>
+          <div class="arrow">→</div>
+          <div class="step"><b>图谱构建</b>Neo4j</div>
+        </div>
+        <div class="legend">失败自动回滚并标记 failed，支持重试（reprocess）</div>
+      </div>
+      <div class="node" style="flex-basis:46%;">
+        <b>多模式协同问答（RAG 编排）</b>
+        <div class="pipeline" style="margin-top:8px;">
+          <div class="step"><b>问题</b></div>
+          <div class="arrow">→</div>
+          <div class="step"><b>三路检索</b>BM25 / 向量 / 图谱</div>
+          <div class="arrow">→</div>
+          <div class="step"><b>RRF融合</b>加权排序</div>
+          <div class="arrow">→</div>
+          <div class="step"><b>千问生成</b></div>
+          <div class="arrow">→</div>
+          <div class="step"><b>答案+引用</b></div>
+        </div>
+        <div class="legend">单路检索故障自动降级，其余路照常参与融合；热点问题 Redis 缓存</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-title">④ 存储与服务基座</div>
+    <div class="row">
+      <div class="node"><b>MySQL</b><span class="tag">用户/文档/分块/会话</span></div>
+      <div class="node"><b>Redis</b><span class="tag">JWT黑名单 / 热点缓存</span></div>
+      <div class="node"><b>Chroma</b><span class="tag">分块向量（余弦）</span></div>
+      <div class="node"><b>Neo4j</b><span class="tag">实体-关系-证据图谱</span></div>
+      <div class="node"><b>千问（OpenAI兼容）</b><span class="tag">qwen-plus 对话 · text-embedding-v3 嵌入</span></div>
+    </div>
+  </div>
+
+  <div class="legend" style="margin-top:4px;">
+    <span><span class="dot" style="background:#2E6E9E;"></span>模块 / 服务</span>
+    <span><span class="dot" style="background:#8BC8EA;"></span>流水线与检索链路</span>
+    <span>三路检索说明：BM25（jieba+BM25Okapi 精确匹配）｜向量（千问Embedding 语义相似）｜图谱（实体链接+一跳邻居扩展）</span>
+  </div>
+</body>
+</html>
